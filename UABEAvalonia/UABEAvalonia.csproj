@@ -5,7 +5,8 @@
     <Nullable>enable</Nullable>
     <Platforms>AnyCPU;x64;x86</Platforms>
     <ApplicationIcon>uabeavalonia.ico</ApplicationIcon>
-    <PublishAot>true</PublishAot>
+    <!-- Native AOT is unavailable for net6.0; keep framework-dependent publishing. -->
+    <PublishAot>false</PublishAot>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
