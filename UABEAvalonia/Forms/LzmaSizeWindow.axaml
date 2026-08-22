@@ -1,0 +1,34 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Width="440" Height="220"
+        x:Class="UABEAvalonia.LzmaSizeWindow"
+        Title="LZMA Size"
+        WindowStartupLocation="CenterOwner">
+  <Grid Margin="16">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="*" />
+      <RowDefinition Height="Auto" />
+    </Grid.RowDefinitions>
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition Width="170" />
+      <ColumnDefinition Width="*" />
+    </Grid.ColumnDefinitions>
+
+    <Label Grid.Row="0" Grid.Column="0">Final size (bytes)</Label>
+    <TextBox Grid.Row="0" Grid.Column="1" Name="boxFinalSize" Watermark="Example: 6606163" />
+
+    <Label Grid.Row="1" Grid.Column="0">Bytes</Label>
+    <TextBox Grid.Row="1" Grid.Column="1" Name="boxBytes" Text="111111" />
+
+    <TextBlock Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,12,0,8"
+               TextWrapping="Wrap">The Bytes field is informational only. Random bytes are used for padding, and the final byte is always 0.</TextBlock>
+
+    <StackPanel Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Right">
+      <Button Name="btnOk" Width="90" Margin="0,0,8,0">OK</Button>
+      <Button Name="btnCancel" Width="90">Cancel</Button>
+    </StackPanel>
+  </Grid>
+</Window>
+

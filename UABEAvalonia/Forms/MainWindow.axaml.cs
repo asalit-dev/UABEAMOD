@@ -743,7 +743,19 @@ namespace UABEAvalonia
 
                 if (compType != AssetBundleCompressionType.None)
                 {
+                    long targetSize = 0;
+                    if (compType == AssetBundleCompressionType.LZMA)
+                    {
+                        LzmaSizeWindow sizeWindow = new LzmaSizeWindow();
+                        long? requestedSize = await sizeWindow.ShowDialog<long?>(this);
+                        if (!requestedSize.HasValue)
+                            return;
+
+                        targetSize = requestedSize.Value;
+                    }
+
                     ProgressWindow progressWindow = new ProgressWindow("Compressing...");
+                    Exception? compressionError = null;
 
                     Thread thread = new Thread(new ParameterizedThreadStart(CompressBundle));
                     object[] threadArgs =
@@ -751,11 +763,18 @@ namespace UABEAvalonia
                         BundleInst,
                         selectedFilePath,
                         compType,
-                        progressWindow.Progress
+                        progressWindow.Progress,
+                        targetSize,
+                        new Action<Exception>(ex => compressionError = ex)
                     };
                     thread.Start(threadArgs);
 
                     await progressWindow.ShowDialog(this);
+
+                    if (compressionError != null)
+                    {
+                        await MessageBoxUtil.ShowDialog(this, "Compression error", compressionError.Message);
+                    }
                 }
             }
             else
@@ -965,11 +984,78 @@ namespace UABEAvalonia
             var path = (string)argsArr[1];
             var compType = (AssetBundleCompressionType)argsArr[2];
             var progress = (IAssetBundleCompressProgress)argsArr[3];
+            long targetSize = (long)argsArr[4];
+            var reportError = (Action<Exception>)argsArr[5];
 
-            using (FileStream fs = File.Open(path, FileMode.Create))
-            using (AssetsFileWriter w = new AssetsFileWriter(fs))
+            try
             {
+                CompressBundleCore(bundleInst, path, compType, progress, targetSize);
+            }
+            catch (Exception ex)
+            {
+                reportError(ex);
+            }
+        }
+
+        private static void CompressBundleCore(BundleFileInstance bundleInst, string path,
+            AssetBundleCompressionType compType, IAssetBundleCompressProgress progress, long targetSize)
+        {
+            if (compType != AssetBundleCompressionType.LZMA)
+            {
+                using FileStream fs = File.Open(path, FileMode.Create);
+                using AssetsFileWriter w = new AssetsFileWriter(fs);
                 bundleInst.file.Pack(bundleInst.file.Reader, w, compType, true, progress);
+                return;
+            }
+
+            using MemoryStream compressedStream = new MemoryStream();
+            using (AssetsFileWriter compressedWriter = new AssetsFileWriter(compressedStream))
+            {
+                bundleInst.file.Pack(bundleInst.file.Reader, compressedWriter, compType, true, progress);
+            }
+
+            long compressedSize = compressedStream.Length;
+            if (compressedSize > targetSize)
+            {
+                throw new InvalidOperationException(
+                    $"The compressed file is {compressedSize} bytes, which is larger than the requested {targetSize} bytes.");
+            }
+
+            compressedStream.Position = 0;
+            using FileStream output = File.Open(path, FileMode.Create);
+
+            // Always remove the final compressed byte before adding padding.
+            long preservedSize = Math.Max(0, compressedSize - 1);
+            CopyBytes(compressedStream, output, preservedSize);
+
+            long paddingSize = targetSize - preservedSize;
+            WriteRandomBytes(output, paddingSize - 1);
+            output.WriteByte(0);
+        }
+
+        private static void CopyBytes(Stream source, Stream destination, long count)
+        {
+            byte[] buffer = new byte[64 * 1024];
+            while (count > 0)
+            {
+                int readLength = source.Read(buffer, 0, (int)Math.Min(buffer.Length, count));
+                if (readLength == 0)
+                    throw new EndOfStreamException("Unexpected end of compressed data.");
+
+                destination.Write(buffer, 0, readLength);
+                count -= readLength;
+            }
+        }
+
+        private static void WriteRandomBytes(Stream destination, long count)
+        {
+            byte[] buffer = new byte[64 * 1024];
+            while (count > 0)
+            {
+                int writeLength = (int)Math.Min(buffer.Length, count);
+                Random.Shared.NextBytes(buffer.AsSpan(0, writeLength));
+                destination.Write(buffer, 0, writeLength);
+                count -= writeLength;
             }
         }
 
