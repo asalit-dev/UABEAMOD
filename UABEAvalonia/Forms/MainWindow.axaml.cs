@@ -1024,13 +1024,16 @@ namespace UABEAvalonia
             compressedStream.Position = 0;
             using FileStream output = File.Open(path, FileMode.Create);
 
-            // Always remove the final compressed byte before adding padding.
-            long preservedSize = Math.Max(0, compressedSize - 1);
+            // Preserve every byte produced by LZMA. Patch only appends padding.
+            long preservedSize = compressedSize;
             CopyBytes(compressedStream, output, preservedSize);
 
             long paddingSize = targetSize - preservedSize;
-            WriteRandomBytes(output, paddingSize - 1);
-            output.WriteByte(0);
+            if (paddingSize > 0)
+            {
+                WriteRandomBytes(output, paddingSize - 1);
+                output.WriteByte(0);
+            }
         }
 
         private static void CopyBytes(Stream source, Stream destination, long count)
