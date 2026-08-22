@@ -2,9 +2,9 @@ name: Build UABEA Windows
 
 on:
   push:
-    branches: [ master, net6-migration ]
+    branches: [ main ]
   pull_request:
-    branches: [ master, net6-migration ]
+    branches: [ main ]
 
 jobs:
   build:
