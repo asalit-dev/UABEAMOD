@@ -1009,10 +1009,10 @@ namespace UABEAvalonia
             }
 
             using MemoryStream compressedStream = new MemoryStream();
-            using (AssetsFileWriter compressedWriter = new AssetsFileWriter(compressedStream))
-            {
-                bundleInst.file.Pack(bundleInst.file.Reader, compressedWriter, compType, true, progress);
-            }
+            // Do not dispose this writer here: BinaryWriter.Dispose closes the MemoryStream.
+            AssetsFileWriter compressedWriter = new AssetsFileWriter(compressedStream);
+            bundleInst.file.Pack(bundleInst.file.Reader, compressedWriter, compType, true, progress);
+            compressedWriter.Flush();
 
             long compressedSize = compressedStream.Length;
             if (compressedSize > targetSize)
