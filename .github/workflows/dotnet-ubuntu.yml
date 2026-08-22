@@ -2,9 +2,9 @@ name: Build UABEA Ubuntu
 
 on:
   push:
-    branches: [ master ]
+    branches: [ master, net6-migration ]
   pull_request:
-    branches: [ master ]
+    branches: [ master, net6-migration ]
 
 jobs:
   build:
