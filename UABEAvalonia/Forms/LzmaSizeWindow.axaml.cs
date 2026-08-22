@@ -14,7 +14,6 @@ namespace UABEAvalonia
             this.AttachDevTools();
 #endif
             btnOk.Click += BtnOk_Click;
-            btnCancel.Click += BtnCancel_Click;
         }
 
         private async void BtnOk_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
@@ -28,10 +27,6 @@ namespace UABEAvalonia
             Close(finalSize);
         }
 
-        private void BtnCancel_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
-        {
-            Close(null);
-        }
     }
 }
 

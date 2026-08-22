@@ -1,30 +1,30 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Width="440" Height="220"
+        Width="360" Height="190"
         x:Class="UABEAvalonia.LzmaSizeWindow"
         Title="LZMA Size"
         WindowStartupLocation="CenterOwner">
-  <Grid Margin="16">
-    <Grid.RowDefinitions>
-      <RowDefinition Height="Auto" />
-      <RowDefinition Height="*" />
-      <RowDefinition Height="Auto" />
-    </Grid.RowDefinitions>
-    <Grid.ColumnDefinitions>
-      <ColumnDefinition Width="170" />
-      <ColumnDefinition Width="*" />
-    </Grid.ColumnDefinitions>
+  <StackPanel Margin="20" Spacing="12">
+    <TextBlock Text="is by Loki x Ryx"
+               HorizontalAlignment="Center"
+               FontSize="18"
+               FontWeight="Bold"
+               Foreground="#87CEEB" />
 
-    <Label Grid.Row="0" Grid.Column="0">Final size (bytes)</Label>
-    <TextBox Grid.Row="0" Grid.Column="1" Name="boxFinalSize" Watermark="Example: 6606163" />
+    <TextBox Name="boxFinalSize"
+             Height="42"
+             FontSize="16"
+             Watermark="Final size in bytes"
+             HorizontalContentAlignment="Center"
+             VerticalContentAlignment="Center" />
 
-    <TextBlock Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,12,0,8"
-               TextWrapping="Wrap">The final byte is always 0. The bytes added before it are random padding.</TextBlock>
-
-    <StackPanel Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Right">
-      <Button Name="btnOk" Width="90" Margin="0,0,8,0">OK</Button>
-      <Button Name="btnCancel" Width="90">Cancel</Button>
-    </StackPanel>
-  </Grid>
+    <Button Name="btnOk"
+            Height="40"
+            HorizontalAlignment="Stretch"
+            Background="#F44336"
+            Foreground="#87CEEB"
+            FontWeight="Bold"
+            FontSize="16">OK</Button>
+  </StackPanel>
 </Window>
 
